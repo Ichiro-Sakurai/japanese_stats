@@ -14,8 +14,7 @@ appId = "26e8de92a6dfdc808578d9cc40bccc61a989e8ab"
 
 CPI <- function(from = 2001,
                 to = 2024,
-                sogo = "総合",
-                style = "normal") {
+                sogo = "総合") {
   
   
   meta <- estat_getMetaInfo(appId = appId,
@@ -110,3 +109,39 @@ CPI <- function(from = 2001,
   return(p)
 }
 
+gap <- function(from = 2001,
+                to =2024) {
+  
+  data0 <- read.xlsx("https://www.boj.or.jp/research/research_data/gap/gap.xlsx",
+                    startRow=5,
+                    cols = 1:4)
+  colnames(data0) <- c("time0","需給ギャップ", "資本投入ギャップ", "労働投入ギャップ")
+  
+  data <- data0 %>%
+    mutate(year = str_sub(time0, 1, 4),
+           month = case_when(str_ends(time0, "1Q") ~ "-01-01",
+                             str_ends(time0, "2Q") ~ "-04-01",
+                             str_ends(time0, "3Q") ~ "-07-01",
+                             str_ends(time0, "4Q") ~ "-10-01"),
+           time = paste0(year, month) %>% ymd()) %>%
+    select(-time0, -year, -month) %>%
+    drop_na() %>%
+    pivot_longer(-time) %>%
+    filter(time >= as.Date(paste0(from, "-01-01")) & time <= as.Date(paste0(to, "-01-01")))
+  
+  ggplot() + 
+    geom_bar(data=subset(data, name != "需給ギャップ"), mapping=aes(x = time, y = value, fill=name), stat="identity") + 
+    geom_line(data=subset(data, name == "需給ギャップ"), mapping=aes(x = time, y = value, color = name)) + 
+    scale_color_manual(values = c("black")) +
+    labs(title = "需給ギャップ",
+         x = "（年/四半期）",
+         y = "(%)",
+         color = "",
+         fill = "",
+         caption = "出典：日本銀行") + 
+    guides(color = guide_legend(order = 1), fill = guide_legend(order = 2)) -> p
+  
+  return(p)
+    
+    
+}

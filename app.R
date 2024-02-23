@@ -18,7 +18,8 @@ ui <- fluidPage(
       selectInput("stat", "統計：",
                   choices = c("消費者物価指数（総合）",
                               "消費者物価指数（生鮮食品を除く総合）",
-                              "消費者物価指数（生鮮食品を除く総合、財・サービス）")),
+                              "消費者物価指数（生鮮食品を除く総合、財・サービス）",
+                              "需給ギャップ")),
       
       sliderInput("range", "年：",
                   min = 1980, max = lubridate::year(Sys.Date()) |> as.numeric(),
@@ -51,15 +52,17 @@ server <- function(input, output) {
     if(input$stat %in% c("消費者物価指数（総合）", "消費者物価指数（生鮮食品を除く総合）")){
     
       p <- CPI(from = input$range[1], to = input$range[2],
-               sogo = ifelse(input$stat == "消費者物価指数（総合）", "総合", "生鮮食品を除く総合"),
-               style = input$style)
+               sogo = ifelse(input$stat == "消費者物価指数（総合）", "総合", "生鮮食品を除く総合"))
       
     } else if (input$stat == "消費者物価指数（生鮮食品を除く総合、財・サービス）") {
       
       p <- CPI(from = input$range[1], to = input$range[2],
-               sogo = "生鮮食品を除く総合(財・サービス)",
-               style = input$style)
+               sogo = "生鮮食品を除く総合(財・サービス)")
     
+    }　else if (input$stat == "需給ギャップ") {
+      
+      p <- gap(from = input$range[1], to = input$range[2])
+      
     }
     
     if(input$style == "excel") {

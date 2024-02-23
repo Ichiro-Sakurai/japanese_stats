@@ -1,6 +1,6 @@
 # japanese_stats
 
-## Use app in shinyapp.io
+## Use app in shinyapps.io
 
 Please visit https://s9x60f-ichiro-sakurai.shinyapps.io/japanese_stats/
 

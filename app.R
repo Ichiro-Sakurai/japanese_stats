@@ -2,10 +2,10 @@ if(!require("shiny")){
   install.packages("shiny")
 }
 
-
-
 library(shiny)
 source("functions.R")
+
+DATA <- getdata()
 
 ui <- fluidPage(
   

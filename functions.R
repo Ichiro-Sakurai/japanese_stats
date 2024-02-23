@@ -12,13 +12,51 @@ pacman::p_load(tidyverse,
 
 appId = "26e8de92a6dfdc808578d9cc40bccc61a989e8ab"
 
+getdata <- function() {
+  DATA <- list()
+  
+  ### CPI ###
+  meta <- estat_getMetaInfo(appId = appId,
+                            statsDataId = "0003427113")
+  
+  DATA[["CPI"]] <- estat_getStatsData(
+    appId = appId,
+    statsDataId = "0003427113",
+    cdTimeFrom = as.character(from - 1),
+    cdTimeTo = as.character(to),
+    cdArea = "00000",
+    cdTab = "1",
+    cdCat01  = meta$cat01 %>% filter(`@level` == "1") %>% pull(`@code`)
+  )
+  
+  # ウェイトの取得
+  DATA[["CPI_weight_zai_service"]] <- read.csv("https://www.e-stat.go.jp/stat-search/file-download?statInfId=000032103845&fileKind=1",
+                                    fileEncoding = "shift-jis",
+                                    header = FALSE) %>%
+    .[c(1,5), -1] %>%
+    t() %>%
+    as_tibble()
+  
+  DATA[["CPI_weight"]] <- read.csv("https://www.e-stat.go.jp/stat-search/file-download?statInfId=000032103842&fileKind=1",
+                                   fileEncoding = "shift-jis",
+                                   header = FALSE) %>%
+    .[c(1,5), -1] %>%
+    t() %>%
+    as_tibble()
+  
+  ### GDP gap ###
+  
+  DATA[["gap"]] <- read.xlsx("https://www.boj.or.jp/research/research_data/gap/gap.xlsx",
+                              startRow=5,
+                              cols = 1:4)
+  return(DATA)
+}
+
 CPI <- function(from = 2001,
                 to = 2024,
                 sogo = "総合") {
   
-  
-  meta <- estat_getMetaInfo(appId = appId,
-                            statsDataId = "0003427113")
+  data0 <- DATA[["CPI"]]
   
   zai_service <- FALSE
   
@@ -34,29 +72,11 @@ CPI <- function(from = 2001,
   
   all <- c(sogo, judai)
 
-  data0 <- estat_getStatsData(
-    appId = appId,
-    statsDataId = "0003427113",
-    cdTimeFrom = as.character(from - 1),
-    cdTimeTo = as.character(to),
-    cdArea = "00000",
-    cdTab = "1",
-    cdCat01  = meta$cat01 %>% filter(`@level` == "1") %>% pull(`@code`)
-    )
-
-  
-  # ウェイトの取得
-  url <- ifelse(zai_service,
-                "https://www.e-stat.go.jp/stat-search/file-download?statInfId=000032103845&fileKind=1",
-                "https://www.e-stat.go.jp/stat-search/file-download?statInfId=000032103842&fileKind=1")
-  
-  weight <- read.csv(url,
-                     fileEncoding = "shift-jis",
-                     header = FALSE) %>%
-    .[c(1,5), -1] %>%
-    t() %>%
-    as.data.frame()
-    
+  weight <- if (zai_service) {
+    DATA[["CPI_weight_zai_service"]]
+  } else {
+    DATA[["CPI_weight"]]
+  }
   colnames(weight) <- c("category", "weight")
   weight$weight <- as.numeric(weight$weight)
   
@@ -112,9 +132,8 @@ CPI <- function(from = 2001,
 gap <- function(from = 2001,
                 to =2024) {
   
-  data0 <- read.xlsx("https://www.boj.or.jp/research/research_data/gap/gap.xlsx",
-                    startRow=5,
-                    cols = 1:4)
+  data0 <- DATA[["gap"]]
+  
   colnames(data0) <- c("time0","需給ギャップ", "資本投入ギャップ", "労働投入ギャップ")
   
   data <- data0 %>%

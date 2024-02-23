@@ -19,11 +19,17 @@ CPI <- function(from = 2001,
   meta <- estat_getMetaInfo(appId = appId,
                             statsDataId = "0003427113")
   
+  zai_service <- FALSE
+  
   if(sogo == "総合") {
     judai <- c("食料", "住居", "光熱・水道", "家具・家事用品", "被服及び履物", "保健医療", "交通・通信", "教育", "教養娯楽", "諸雑費")
   } else if (sogo == "生鮮食品を除く総合") {
     judai <- c("生鮮食品を除く食料", "住居", "光熱・水道", "家具・家事用品", "被服及び履物", "保健医療", "交通・通信", "教育", "教養娯楽", "諸雑費")
-  } 
+  } else if (sogo == "生鮮食品を除く総合(財・サービス)") {
+    judai <- c("生鮮食品を除く財", "サービス")
+    sogo <- c("生鮮食品を除く総合")
+    zai_service <- TRUE
+  }
   
   all <- c(sogo, judai)
 
@@ -36,13 +42,34 @@ CPI <- function(from = 2001,
     cdTab = "1",
     cdCat01  = meta$cat01 %>% filter(`@level` == "1") %>% pull(`@code`)
     )
+
   
-  weight <- read.xlsx("https://www.stat.go.jp/data/cpi/2020/zuhyou/rensa-wt_2020.xlsx") %>%
-    filter(`類・品目` %in% all) %>%
-    select(`類・品目`, `ウエイト`) %>%
-    rename(category = `類・品目`, weight = `ウエイト`) %>%
-    mutate(weight = as.numeric(weight))
+  # ウェイトの取得
+  url <- ifelse(zai_service,
+                "https://www.e-stat.go.jp/stat-search/file-download?statInfId=000032103845&fileKind=1",
+                "https://www.e-stat.go.jp/stat-search/file-download?statInfId=000032103842&fileKind=1")
   
+  weight <- read.csv(url,
+                     fileEncoding = "shift-jis",
+                     header = FALSE) %>%
+    .[c(1,5), -1] %>%
+    t() %>%
+    as.data.frame()
+    
+  colnames(weight) <- c("category", "weight")
+  weight$weight <- as.numeric(weight$weight)
+  
+  if(!("生鮮食品を除く総合" %in% weight$category)) {
+    A <- weight %>% filter(category == "生鮮食品を除く財") %>% pull(weight)
+    B <- weight %>% filter(category == "サービス") %>% pull(weight)
+    
+    weight <- bind_rows(weight,
+                        tibble(category = "生鮮食品を除く総合",
+                               weight = A + B))
+  }
+  
+  
+  # データの整形
   data <- data0 %>%
     filter(cat01_code != "0201") %>% #総合が２回出てくるため
     filter(str_sub(time_code, -2, -1) != "00") %>%

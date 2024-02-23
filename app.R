@@ -15,7 +15,8 @@ ui <- fluidPage(
       
       selectInput("stat", "統計：",
                   choices = c("消費者物価指数（総合）",
-                              "消費者物価指数（生鮮食品を除く総合）")),
+                              "消費者物価指数（生鮮食品を除く総合）",
+                              "消費者物価指数（生鮮食品を除く総合、財・サービス）")),
       
       sliderInput("range", "年：",
                   min = 1980, max = lubridate::year(Sys.Date()) |> as.numeric(),
@@ -45,6 +46,11 @@ server <- function(input, output) {
       CPI(from = input$range[1], to = input$range[2],
           sogo = ifelse(input$stat == "消費者物価指数（総合）", "総合", "生鮮食品を除く総合"))
       
+    } else if (input$stat == "消費者物価指数（生鮮食品を除く総合、財・サービス）") {
+      
+      CPI(from = input$range[1], to = input$range[2],
+          sogo = "生鮮食品を除く総合(財・サービス)")
+    
     }
     
   })

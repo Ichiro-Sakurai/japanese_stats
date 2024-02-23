@@ -45,7 +45,6 @@ ui <- fluidPage(
 server <- function(input, output) {
   
   source("functions.R")
-  DATA <- getdata()
   
   output$plot <- renderPlot({
     

@@ -12,6 +12,8 @@ pacman::p_load(tidyverse,
 
 appId = "26e8de92a6dfdc808578d9cc40bccc61a989e8ab"
 
+
+##### GET DATA #####
 getdata <- function() {
   DATA <- list()
   
@@ -51,6 +53,11 @@ getdata <- function() {
                               cols = 1:4)
   return(DATA)
 }
+
+# なぜかここでDATAを取得するとうまくいき、serverでやろうとするとうまくいかない
+DATA <- getdata()
+
+##### FUNCTIONS #####
 
 CPI <- function(from = 2001,
                 to = 2024,

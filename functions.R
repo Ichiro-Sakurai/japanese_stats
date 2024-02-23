@@ -106,18 +106,7 @@ CPI <- function(from = 2001,
          fill = "",
          caption = "出典：総務省") + 
     guides(color = guide_legend(order = 1), fill = guide_legend(order = 2)) -> p
-  
-  
-  # Change the style
-  if (style == "excel") {
-    p <- p + theme_excel() + scale_fill_excel()
-  }
-  if (style == "economist") {
-    p <- p + theme_economist() + scale_fill_economist()
-  }
-  
-  
-  
+
   return(p)
 }
 

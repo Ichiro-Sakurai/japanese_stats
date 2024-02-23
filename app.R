@@ -62,8 +62,13 @@ server <- function(input, output) {
     
     }
     
-    p
+    if(input$style == "excel") {
+      p <- p + theme_excel() + scale_fill_excel()
+    } else if (input$style == "economist") {
+      p <- p + theme_economist() + scale_fill_economist()
+    }
     
+    p
     
   })
   

@@ -22,8 +22,8 @@ getdata <- function() {
   DATA[["CPI"]] <- estat_getStatsData(
     appId = appId,
     statsDataId = "0003427113",
-    cdTimeFrom = as.character(from - 1),
-    cdTimeTo = as.character(to),
+    #cdTimeFrom = as.character(from - 1),
+    #cdTimeTo = as.character(to),
     cdArea = "00000",
     cdTab = "1",
     cdCat01  = meta$cat01 %>% filter(`@level` == "1") %>% pull(`@code`)

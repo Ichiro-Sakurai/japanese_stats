@@ -6,14 +6,16 @@ if(!require("pacman")){
 pacman::p_load(tidyverse,
                estatapi,
                lubridate,
-               openxlsx
+               openxlsx,
+               ggthemes
                )
 
 appId = "26e8de92a6dfdc808578d9cc40bccc61a989e8ab"
 
 CPI <- function(from = 2001,
                 to = 2024,
-                sogo = "総合") {
+                sogo = "総合",
+                style = "normal") {
   
   
   meta <- estat_getMetaInfo(appId = appId,
@@ -98,12 +100,23 @@ CPI <- function(from = 2001,
     geom_line(data=subset(data2, category == sogo), mappin = aes(x = time, y = kiyodo, color = category)) + 
     scale_color_manual(values = c("black")) +
     labs(title = "消費者物価指数（全国）",
-         x = "",
+         x = "（年/月）",
          y = "前年同期比(%)",
          color = "",
          fill = "",
          caption = "出典：総務省") + 
     guides(color = guide_legend(order = 1), fill = guide_legend(order = 2)) -> p
+  
+  
+  # Change the style
+  if (style == "excel") {
+    p <- p + theme_excel() + scale_fill_excel()
+  }
+  if (style == "economist") {
+    p <- p + theme_economist() + scale_fill_economist()
+  }
+  
+  
   
   return(p)
 }

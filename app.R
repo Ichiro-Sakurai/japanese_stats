@@ -2,6 +2,8 @@ if(!require("shiny")){
   install.packages("shiny")
 }
 
+
+
 library(shiny)
 source("functions.R")
 
@@ -22,7 +24,12 @@ ui <- fluidPage(
                   min = 1980, max = lubridate::year(Sys.Date()) |> as.numeric(),
                   value = c(2001, lubridate::year(Sys.Date()) |> as.numeric())
                   
-      )
+      ),
+      
+      radioButtons("style", "Style: ",
+                   c("Normal" = "normal",
+                     "Excel" = "excel",
+                     "Economist" = "economist"))
       
     ),
     
@@ -43,15 +50,20 @@ server <- function(input, output) {
     
     if(input$stat %in% c("消費者物価指数（総合）", "消費者物価指数（生鮮食品を除く総合）")){
     
-      CPI(from = input$range[1], to = input$range[2],
-          sogo = ifelse(input$stat == "消費者物価指数（総合）", "総合", "生鮮食品を除く総合"))
+      p <- CPI(from = input$range[1], to = input$range[2],
+               sogo = ifelse(input$stat == "消費者物価指数（総合）", "総合", "生鮮食品を除く総合"),
+               style = input$style)
       
     } else if (input$stat == "消費者物価指数（生鮮食品を除く総合、財・サービス）") {
       
-      CPI(from = input$range[1], to = input$range[2],
-          sogo = "生鮮食品を除く総合(財・サービス)")
+      p <- CPI(from = input$range[1], to = input$range[2],
+               sogo = "生鮮食品を除く総合(財・サービス)",
+               style = input$style)
     
     }
+    
+    p
+    
     
   })
   

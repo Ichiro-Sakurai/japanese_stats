@@ -15,3 +15,7 @@ library(shiny)
 runGitHub(repo = "japanese_stats", username = "Ichiro-Sakurai")
 ```
 
+## 注意
+
+このサービスは、政府統計総合窓口(e-Stat)のAPI機能を使用していますが、サービスの内容は国によって保証されたものではありません。
+

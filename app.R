@@ -3,9 +3,6 @@ if(!require("shiny")){
 }
 
 library(shiny)
-source("functions.R")
-
-DATA <- getdata()
 
 ui <- fluidPage(
   
@@ -46,6 +43,9 @@ ui <- fluidPage(
 )
 
 server <- function(input, output) {
+  
+  source("functions.R")
+  DATA <- getdata()
   
   output$plot <- renderPlot({
     

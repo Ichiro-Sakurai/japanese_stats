@@ -2,11 +2,7 @@
 
 ## Use app in shinyapps.io
 
-~~Please visit https://s9x60f-ichiro-sakurai.shinyapps.io/japanese_stats/~~
-
--> It does not work, because the application load the all data before the begining of the session to avoid load data for every time, and it seems to be hard for the server.
-
-
+Please visit https://s9x60f-ichiro-sakurai.shinyapps.io/japanese_stats/
 
 ## Use app in your local R environment
 

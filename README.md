@@ -1,5 +1,8 @@
 # japanese_stats
 
+This repository is an attempt to automate the graphing of official statistics in Japan.
+日本の公的統計のグラフ化を自動化しようという試みです。
+
 ## Open in shinyapps.io
 
 Please visit https://s9x60f-ichiro-sakurai.shinyapps.io/japanese_stats/
